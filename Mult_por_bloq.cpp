@@ -6,6 +6,30 @@
 
 using namespace std;
 
+double mult_mat(const vector<vector<double>>& matriz_1, const vector<vector<double>>& matriz_2, vector<vector<double>>& res, int N) {
+    for (int i = 0; i < N; i++){
+        for (int j = 0; j < N; j++){
+            res[i][j] = 0.0;
+        }
+    }        
+ 
+    auto start = chrono::high_resolution_clock::now();
+ 
+    for (int i = 0; i < N; i++) {          
+        for (int j = 0; j < N; j++) {      
+            double suma = 0.0;
+            for (int k = 0; k < N; k++) {  
+                suma += matriz_1[i][k] * matriz_2[k][j];
+            }
+            res[i][j] = suma;
+        }
+    }
+ 
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double, milli> duration = end - start;
+    return duration.count();
+}
+
 double mult_por_bloqs(const vector<vector<double>>& matriz_1,  const vector<vector<double>>& matriz_2,  vector<vector<double>>& resultado,
                                  int N, int tam_b) {
     for (int i = 0; i < N; i++){
@@ -61,11 +85,23 @@ int main(){
             }
         }
 
-        for(int b = 0; b < tam_b.size(); b++){
-            double t_mult = mult_por_bloqs(matriz_1, matriz_2, resultado, MAX[m], tam_b[b]);
-            cout << "Tamano: " << MAX[m] << endl;
+        double t_mult_normal = mult_mat(matriz_1, matriz_2, resultado, MAX[m]);
+
+        cout << "==============================================" << endl;
+        cout << "Tamano: " << MAX[m] << endl;
+        cout << "Multiplicacion normal" << endl;
+        cout << "Duracion " << t_mult_normal << endl;
+        cout << "==============================================" << endl;
+        cout << "Multiplicacion por bloques" << endl;
+
+        for(size_t b = 0; b < tam_b.size(); b++){
+            double t_mult_bloques = mult_por_bloqs(matriz_1, matriz_2, resultado, MAX[m], tam_b[b]);
             cout<< "Numero de bloques " << tam_b[b] << endl;
-            cout << "Duracion " << t_mult << endl;
+            cout << "Duracion " << t_mult_bloques << endl;
+            double speedup = t_mult_normal / t_mult_bloques;
+            cout << "SpeedUp: " << speedup << endl;
+            cout << "-------------------------------------------------" << endl;
+
         }       
 
     }
